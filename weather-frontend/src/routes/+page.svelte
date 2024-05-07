@@ -3,6 +3,7 @@
 <script>
   let city = "";
   let weatherData = {};
+  let citySuggestions = [];
 
   async function getWeather() {
     const response = await fetch(
@@ -11,11 +12,28 @@
     weatherData = await response.json();
     console.log(weatherData);
   }
+
+  async function getCitySuggestions(keyword) {
+    const response = await fetch(
+      `http://localhost:5000/api/cities?keyword=${keyword}`
+    );
+    citySuggestions = await response.json();
+    console.log(citySuggestions);
+  }
+
+  function handleInput(event) {
+    const keyword = event.target.value.trim();
+    if (keyword !== "") {
+      getCitySuggestions(keyword);
+    } else {
+      citySuggestions = [];
+    }
+  }
 </script>
 
 <div class="container">
   <div class="input-container">
-    <input type="text" bind:value={city} placeholder="Enter city" />
+    <input type="text" bind:value={city} placeholder="Enter city" on:input={handleInput} />
     <button on:click={getWeather}>Get Weather</button>
   </div>
 
