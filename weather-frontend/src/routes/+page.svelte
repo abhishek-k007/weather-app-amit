@@ -4,6 +4,7 @@
   let city = "";
   let weatherData = {};
   let citySuggestions = [];
+  let showSuggestions = false;
 
   async function getWeather() {
     const response = await fetch(
@@ -25,16 +26,34 @@
     const keyword = event.target.value.trim();
     if (keyword !== "") {
       getCitySuggestions(keyword);
+      showSuggestions = true;
     } else {
       citySuggestions = [];
+      showSuggestions = false;
     }
   }
+
+   /*  Function to handle selection of a city suggestion */
+   function handleSuggestionClick(cityName) {
+    city = cityName;
+    showSuggestions = false;
+    getWeather();
+  }
+
 </script>
 
 <div class="container">
   <div class="input-container">
     <input type="text" bind:value={city} placeholder="Enter city" on:input={handleInput} />
     <button on:click={getWeather}>Get Weather</button>
+    <!-- Suggestions dropdown -->
+  {#if showSuggestions && citySuggestions.length > 0}
+  <ul class="suggestions">
+    {#each citySuggestions as suggestion}
+      <li on:click={() => handleSuggestionClick(suggestion)}>{suggestion}</li>
+    {/each}
+  </ul>
+{/if}
   </div>
 
   {#if Object.keys(weatherData).length > 0}
@@ -75,9 +94,9 @@
   }
 
   .input-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
+  position: relative; /* Set input-container to relative positioning */
+  display: inline-block; /* Change display to inline-block */
+  margin-bottom: 20px;
   }
 
   input[type="text"] {
@@ -131,5 +150,29 @@
     grid-template-rows: repeat(2, 1fr);
     gap: 10px;
     text-align: left;
+  }
+
+  .suggestions {
+  position: absolute;
+  width: auto; /* Set width to auto to fit content */
+  max-width: 100%; /* Set max-width to 100% to prevent overflow */
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-top: none;
+  background-color: #fff;
+  z-index: 1;
+  margin-top: 10px; /* Adjust margin top to create space between input and dropdown */
+  padding-left: 0;
+  list-style-type: none;
+  left: 0; /* Align dropdown with left edge of input */
+}
+  .suggestions li {
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+
+  .suggestions li:hover {
+    background-color: #f0f0f0;
   }
 </style>
